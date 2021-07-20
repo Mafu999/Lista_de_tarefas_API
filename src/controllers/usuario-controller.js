@@ -9,17 +9,17 @@ module.exports = (app, User, bd)=>{
       res.send(bd.users)
     })*/  
     //post, vulgo create do CRUD, cria um usuário com seus atributos. 
-    app.post('/usuario', (req, res)=>{
+    /*app.post('/usuario', (req, res)=>{
       //req.body está requisitando o "corpo" desse usuario.
       const {nome,email,senha} = req.body
       //usando o .push para inserir/criar um novo usuário
-      /*bd.users.push(new User(nome,email,senha))*/
+      bd.users.push(new User(nome,email,senha))
       bd.run(`insert into usuario values (?,?,?,?)`,param1,param2,param3,param4,param5,(err)=>{
         
       })
       //o send é tipo um "return da vida"
       res.send('Usuario adicionado ao BD')
-    })
+    })*/
     //mostra o resultado das pesquisas em json, mostrano os results e a quantidaade (.length)
     /*app.get('/usuario', (req, res)=>{
       res.json({
@@ -66,7 +66,7 @@ module.exports = (app, User, bd)=>{
 
 //Usando o sqlite e não arrays
     app.get("/usuario", (req, res)=>{
-      bd.all("select * from users", (err, rows)=>{
+      bd.all("select * from usuarios", (err, rows)=>{
         if(err){
           res.json({
             message: "Erro ao obter Users",
@@ -76,6 +76,22 @@ module.exports = (app, User, bd)=>{
           res.json({
             result: rows,
             count: rows.length
+          })
+        }
+      })
+    })
+    //Inserindo dados
+    app.post('/usuario', (req, res) =>{
+      const {nome, email, senha} = req.body
+      const createUser = new User(nome, email, senha)
+      bd.run('INSERT INTO USUARIOS (nome, email, senha) VALUES (?,?,?)', createUser.nome, createUser.email, createUser.senha, (err)=>{
+        if(err){
+          res.json({
+            error: erro
+          })
+        } else{
+          res.json({
+            message: "Usuário Criado"
           })
         }
       })
