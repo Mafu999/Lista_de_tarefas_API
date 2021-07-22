@@ -2,8 +2,10 @@
 const { response } = require("express")
 const bd = require("../infra/sqlite-db")
 const User = require("../models/userModel")
+const userDao = require("../DAO/usuarios-DAO")
 //exportando essa função usando uma callback
 module.exports = (app, User, bd)=>{
+  let dao = new userDao(bd)
   //get, vulgo read do CRUD. Significa que quando eu ler a rota "/usuario" ele irá me retornar o conteudo de usuario do bd. 
     /*app.get('/usuario', (req, res) => {
       res.send(bd.users)
@@ -40,11 +42,18 @@ module.exports = (app, User, bd)=>{
 //Deletando um usuário completo loclizando-o pelo e-mail
     app.delete('/usuario/:email', (req, res)=>{
       let parametroEmail = req.params.email
-      bd.users = bd.users.filter((item)=>{
-        return item.email !== parametroEmail
+      dao.deleteFromEmail(parametroEmail)
+      .then(()=>{
+        res.status(200).json({
+          message: `Usuario cujo email ${req.params.email} deletado`
+        })
       })
-      res.send('Deu bom')
-      console.log(bd.users)
+      .catch((err)=>{
+        res.status(500).json({
+          err,
+          message: "Erro na requisição"
+        })
+      })
     })
 
     app.put('/usuario/:nome', (req, res)=>{
